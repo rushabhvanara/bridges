@@ -242,19 +242,28 @@
     <div class="tabs">
         <button id="btn-wheatstone" class="tab-btn" onclick="initBridge('wheatstone')">Wheatstone Bridge</button>
         <button id="btn-desauty" class="tab-btn" onclick="initBridge('desauty')">De Sauty's Bridge</button>
-        <button id="btn-maxwell" class="tab-btn" onclick="initBridge('maxwell')">Maxwell Bridge</button>
+        <button id="btn-maxwell" class="tab-btn" onclick="initBridge('maxwell')">Maxwell Inductance Bridge</button>
     </div>
 
     <div class="workspace">
         <div class="visual-area">
             <svg width="320" height="280" viewBox="0 0 320 280">
+                <!-- Source Connections -->
                 <path d="M 10 140 L 60 140 M 260 140 L 310 140" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4"/>
                 <text x="10" y="135" font-size="10" fill="#64748b">Source (+)</text>
                 <text x="275" y="135" font-size="10" fill="#64748b">Source (-)</text>
+                
+                <!-- Bridge Diamond -->
                 <path d="M 160 40 L 260 140 L 160 240 L 60 140 Z" fill="none" stroke="#334155" stroke-width="3"/>
-                <line x1="160" y1="40" x2="160" y2="240" stroke="#334155" stroke-width="2" stroke-dasharray="2"/>
+                
+                <!-- Galvanometer Connections (Connected to top and bottom nodes) -->
+                <line x1="160" y1="40" x2="160" y2="122" stroke="#ef4444" stroke-width="2" />
+                <line x1="160" y1="158" x2="160" y2="240" stroke="#ef4444" stroke-width="2" />
+                
                 <circle cx="160" cy="140" r="18" fill="white" stroke="#334155" stroke-width="2"/>
                 <text x="154" y="145" font-weight="bold" font-size="14">G</text>
+                
+                <!-- Component Labels -->
                 <text x="85" y="90" id="arm1" font-weight="bold" fill="#2563eb">R1</text>
                 <text x="210" y="90" id="arm2" font-weight="bold" fill="#2563eb">R2</text>
                 <text x="85" y="205" id="arm3" font-weight="bold" fill="#2563eb">R3</text>
@@ -304,10 +313,11 @@
             desc: "AC bridge used to compare two capacitances. Ideal for capacitors with negligible dielectric loss."
         },
         maxwell: {
-            params: { r1: 500, r2: 200, r3: 200, c1: 10 },
-            labels: ['R1 (Ω)', 'R2 (Ω)', 'R3 (Ω)', 'C1 (µF)'],
-            math: "Lx = R2 * R3 * C1",
-            desc: "Measures unknown inductance (Lx) by balancing it against a standard capacitor (C1)."
+            // Maxwell Inductance Comparison Bridge
+            params: { r1: 200, r2: 400, l3: 50, lx: 100 },
+            labels: ['R1 (Ω)', 'R2 (Ω)', 'L3 (mH)', 'Lx (mH)'],
+            math: "L3 / Lx = R1 / R2",
+            desc: "Maxwell Inductance Bridge compares an unknown inductor (Lx) with a standard known inductor (L3) using purely resistive arms."
         }
     };
 
@@ -336,8 +346,8 @@
 
         Object.keys(bridge.params).forEach((key, index) => {
             const val = bridge.params[key];
-            const min = key.startsWith('c') ? 1 : 10;
-            const max = key === 'r1' && activeBridge === 'maxwell' ? 2000 : 1000;
+            const min = 10;
+            const max = (key.startsWith('c') || key.startsWith('l')) ? 200 : 1000;
             
             html += `
                 <div class="control-card">
@@ -383,13 +393,14 @@
                 <div class="calc-row"><span>R2 / R1 = ${p.r2} / ${p.r1}</span> <span>= ${rightSide}</span></div>
             `;
         } else if (activeBridge === 'maxwell') {
-            let Lx = (p.r2 * p.r3 * (p.c1 / 1000000) * 1000).toFixed(2); // mH conversion simplified
-            error = p.r1 - 600; 
-            error /= 20;
+            // Formula: L3 / Lx = R1 / R2 => L3 * R2 = Lx * R1
+            let leftSide = (p.l3 / p.lx).toFixed(3);
+            let rightSide = (p.r1 / p.r2).toFixed(3);
+            error = (p.l3 * p.r2) - (p.lx * p.r1);
+            error /= 200;
             calcHtml = `
-                <div class="calc-row"><span>Lx = R2 * R3 * C1</span></div>
-                <div class="calc-row"><span>Lx = ${p.r2} * ${p.r3} * ${p.c1}µF</span> <span>= ${Lx} mH</span></div>
-                <div class="calc-row" style="color:#64748b; font-size:0.8rem">Adjust R1 to 600Ω for Phase Balance</div>
+                <div class="calc-row"><span>L3 / Lx = ${p.l3} / ${p.lx}</span> <span>= ${leftSide}</span></div>
+                <div class="calc-row"><span>R1 / R2 = ${p.r1} / ${p.r2}</span> <span>= ${rightSide}</span></div>
             `;
         }
 
