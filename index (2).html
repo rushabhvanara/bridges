@@ -1,0 +1,1798 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Electrical Bridge Virtual Lab | Gujarati</title>
+
+<style>
+:root{
+    --primary:#2563eb;
+    --primary-dark:#1d4ed8;
+    --success:#16a34a;
+    --danger:#dc2626;
+    --warning:#f59e0b;
+    --bg:#eef3f8;
+    --card:#ffffff;
+    --ink:#172033;
+    --muted:#64748b;
+    --line:#cbd5e1;
+    --wire:#334155;
+    --blue-wire:#2563eb;
+    --red-wire:#dc2626;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    padding:72px 18px 30px;
+    background:
+        radial-gradient(circle at top left,#dbeafe 0,#eef3f8 35%,#f8fafc 100%);
+    font-family:
+        "Noto Sans Gujarati",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+    color:var(--ink);
+}
+
+.home-link{
+    position:absolute;
+    left:18px;
+    top:15px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:9px 14px;
+    color:#334155;
+    background:white;
+    text-decoration:none;
+    border-radius:9px;
+    font-weight:700;
+    box-shadow:0 3px 12px rgba(15,23,42,.10);
+    z-index:20;
+}
+
+.home-link:hover{
+    color:var(--primary);
+}
+
+.main-container{
+    max-width:1180px;
+    margin:auto;
+    background:rgba(255,255,255,.96);
+    border:1px solid #dbe3ed;
+    border-radius:18px;
+    box-shadow:0 18px 50px rgba(15,23,42,.10);
+    overflow:hidden;
+}
+
+.header{
+    padding:26px 30px 20px;
+    background:
+        linear-gradient(135deg,#eff6ff,#ffffff 65%);
+    border-bottom:1px solid #e2e8f0;
+}
+
+.header h1{
+    margin:0 0 7px;
+    font-size:clamp(1.5rem,3vw,2.15rem);
+    color:#172554;
+}
+
+.header p{
+    margin:0;
+    color:var(--muted);
+}
+
+.tabs{
+    display:flex;
+    gap:6px;
+    padding:7px;
+    margin:22px 28px 0;
+    background:#e2e8f0;
+    border-radius:11px;
+}
+
+.tab-btn{
+    flex:1;
+    border:0;
+    padding:12px 10px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:800;
+    color:#64748b;
+    background:transparent;
+    transition:.2s;
+}
+
+.tab-btn.active{
+    color:var(--primary);
+    background:white;
+    box-shadow:0 2px 8px rgba(15,23,42,.10);
+}
+
+.workspace{
+    display:grid;
+    grid-template-columns:minmax(0,1.25fr) minmax(290px,.75fr);
+    gap:24px;
+    padding:24px 28px;
+}
+
+@media(max-width:900px){
+    .workspace{
+        grid-template-columns:1fr;
+    }
+}
+
+.visual-area{
+    background:#f8fafc;
+    border:1px solid #dbe3ed;
+    border-radius:14px;
+    padding:16px;
+}
+
+.section-title{
+    margin:0 0 10px;
+    font-size:1.05rem;
+    color:#1e3a8a;
+}
+
+.svg-wrap{
+    width:100%;
+    overflow:hidden;
+    border-radius:12px;
+    background:
+        linear-gradient(180deg,#ffffff,#f8fafc);
+    border:1px solid #dbe3ed;
+}
+
+svg{
+    width:100%;
+    height:auto;
+    display:block;
+}
+
+.controls{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.control-card{
+    padding:14px;
+    border:1px solid #dbe3ed;
+    border-radius:10px;
+    background:#fff;
+}
+
+.control-card label{
+    display:block;
+    margin-bottom:7px;
+    color:#475569;
+    font-size:.88rem;
+    font-weight:800;
+}
+
+.value{
+    float:right;
+    color:var(--primary);
+    background:#eff6ff;
+    padding:2px 8px;
+    border-radius:5px;
+    font-family:monospace;
+}
+
+input[type=range]{
+    width:100%;
+    accent-color:var(--primary);
+    cursor:pointer;
+}
+
+.instrument{
+    margin-top:16px;
+    padding:16px;
+    background:#0f172a;
+    border-radius:13px;
+    color:white;
+}
+
+.instrument h3{
+    margin:0 0 12px;
+    font-size:1rem;
+}
+
+/* =====================================================
+   CORRECTED GALVANOMETER
+   ===================================================== */
+
+.meter{
+    position:relative;
+    width:min(390px,100%);
+    height:205px;
+    margin:auto;
+}
+
+.meter-face{
+    position:absolute;
+    left:50%;
+    bottom:0;
+    transform:translateX(-50%);
+    width:100%;
+    height:100%;
+    background:
+        radial-gradient(circle at 50% 100%,
+            #ffffff 0 4px,
+            #e2e8f0 5px 7px,
+            #111827 8px 9px,
+            transparent 10px);
+    border:5px solid #475569;
+    border-bottom:0;
+    border-radius:390px 390px 0 0;
+    overflow:hidden;
+}
+
+/* Scale ticks */
+.tick{
+    position:absolute;
+    left:50%;
+    bottom:0;
+    width:2px;
+    height:88px;
+    background:#64748b;
+    transform-origin:50% 100%;
+}
+
+.tick.major{
+    width:3px;
+    height:96px;
+    background:#1e293b;
+}
+
+.scale-label{
+    position:absolute;
+    bottom:15px;
+    font-size:11px;
+    color:#334155;
+    font-weight:800;
+}
+
+.scale-left{
+    left:23px;
+}
+
+.scale-right{
+    right:23px;
+}
+
+.scale-zero{
+    left:50%;
+    transform:translateX(-50%);
+}
+
+.galvo-needle{
+    position:absolute;
+    left:50%;
+    bottom:0;
+
+    /*
+       IMPORTANT:
+       The needle itself is a vertical rectangle whose bottom
+       is exactly at the pivot. Rotation is therefore around
+       the bottom-center of the needle.
+    */
+    width:4px;
+    height:92px;
+    background:#ef4444;
+    border-radius:4px 4px 0 0;
+
+    transform-origin:50% 100%;
+    transform:translateX(-50%) rotate(0deg);
+
+    transition:transform .18s cubic-bezier(.2,.8,.2,1);
+    z-index:5;
+
+    box-shadow:0 0 5px rgba(239,68,68,.35);
+}
+
+.galvo-pivot{
+    position:absolute;
+    left:50%;
+    bottom:-5px;
+    width:16px;
+    height:16px;
+    transform:translateX(-50%);
+    border-radius:50%;
+    background:#334155;
+    border:3px solid #e2e8f0;
+    z-index:7;
+}
+
+.instrument-reading{
+    margin-top:8px;
+    text-align:center;
+    font-family:monospace;
+    font-size:.9rem;
+    color:#cbd5e1;
+}
+
+.status{
+    margin-top:12px;
+    text-align:center;
+    padding:9px;
+    border-radius:20px;
+    font-weight:800;
+    background:#334155;
+    color:#e2e8f0;
+}
+
+.status.balance{
+    background:#14532d;
+    color:#bbf7d0;
+}
+
+.status.unbalance{
+    background:#7f1d1d;
+    color:#fecaca;
+}
+
+.theory{
+    margin:0 28px 20px;
+    padding:17px;
+    background:#eff6ff;
+    border-left:5px solid var(--primary);
+    border-radius:9px;
+    line-height:1.7;
+}
+
+.theory h3{
+    margin-top:0;
+    color:#1e3a8a;
+}
+
+.math-box{
+    margin-top:12px;
+    padding:12px;
+    background:white;
+    border-radius:8px;
+    border:1px solid #dbeafe;
+    overflow-x:auto;
+}
+
+.calculation{
+    margin:0 28px 22px;
+    padding:17px;
+    border:1px dashed #94a3b8;
+    border-radius:10px;
+    background:#f8fafc;
+}
+
+.calculation h3{
+    margin:0 0 12px;
+    color:#334155;
+}
+
+.calc-row{
+    display:flex;
+    justify-content:space-between;
+    gap:20px;
+    padding:7px 0;
+    border-bottom:1px solid #e2e8f0;
+    font-family:monospace;
+}
+
+.calc-row:last-child{
+    border-bottom:0;
+}
+
+.error-bar{
+    margin-top:12px;
+    height:12px;
+    border-radius:10px;
+    background:#e2e8f0;
+    overflow:hidden;
+}
+
+.error-fill{
+    height:100%;
+    width:0%;
+    background:var(--danger);
+    transition:.2s;
+}
+
+.guide{
+    margin:0 28px 25px;
+    padding:18px;
+    border-radius:12px;
+    background:#fff7ed;
+    border:1px solid #fed7aa;
+}
+
+.guide h3{
+    margin-top:0;
+    color:#9a3412;
+}
+
+.step{
+    display:flex;
+    gap:12px;
+    padding:10px 0;
+    border-bottom:1px solid #fed7aa;
+}
+
+.step:last-child{
+    border-bottom:0;
+}
+
+.step-no{
+    flex:0 0 30px;
+    height:30px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    color:white;
+    background:#ea580c;
+    font-weight:800;
+}
+
+.reference{
+    margin:0 28px 25px;
+    padding:18px;
+    background:#f0fdf4;
+    border-left:5px solid var(--success);
+    border-radius:9px;
+}
+
+footer{
+    text-align:center;
+    padding:24px 15px;
+    color:#64748b;
+    border-top:1px solid #e2e8f0;
+    line-height:1.7;
+}
+
+footer a{
+    color:var(--primary);
+    font-weight:700;
+    text-decoration:none;
+}
+
+.heart{
+    color:#ef4444;
+}
+
+/* SVG component styling */
+
+.wire{
+    stroke:#334155;
+    stroke-width:3;
+    fill:none;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+}
+
+.source-wire{
+    stroke:#2563eb;
+    stroke-width:3;
+    fill:none;
+}
+
+.component{
+    stroke:#0f172a;
+    stroke-width:3;
+    fill:white;
+}
+
+.component-label{
+    font-size:15px;
+    font-weight:800;
+    fill:#1e3a8a;
+}
+
+.node{
+    fill:#0f172a;
+}
+
+.svg-caption{
+    font-size:11px;
+    fill:#64748b;
+}
+
+.cap-plate{
+    stroke:#dc2626;
+    stroke-width:5;
+    stroke-linecap:round;
+}
+
+.inductor-coil{
+    stroke:#7c3aed;
+    stroke-width:3;
+    fill:none;
+}
+
+.hidden{
+    display:none;
+}
+
+.small-note{
+    font-size:.78rem;
+    color:#64748b;
+    margin-top:6px;
+}
+</style>
+</head>
+
+<body>
+
+<a class="home-link" href="https://rushabhvanara.github.io">
+    <svg width="19" height="19" viewBox="0 0 24 24"
+         fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round"
+         stroke-linejoin="round">
+        <path d="M3 10.5 12 3l9 7.5"></path>
+        <path d="M5 9.5V21h14V9.5"></path>
+        <path d="M9 21v-7h6v7"></path>
+    </svg>
+    rushabhvanara.github.io
+</a>
+
+<div class="main-container">
+
+    <header class="header">
+        <h1>Electrical Bridges</h1>
+        <p>
+            Wheatstone Bridge, De Sauty's Bridge અને Maxwell Inductance Bridge
+            માટે ઇન્ટરેક્ટિવ સિમ્યુલેશન
+        </p>
+    </header>
+
+    <div class="tabs">
+        <button id="btn-wheatstone"
+                class="tab-btn"
+                onclick="initBridge('wheatstone')">
+            Wheatstone Bridge
+        </button>
+
+        <button id="btn-desauty"
+                class="tab-btn"
+                onclick="initBridge('desauty')">
+            De Sauty's Bridge
+        </button>
+
+        <button id="btn-maxwell"
+                class="tab-btn"
+                onclick="initBridge('maxwell')">
+            Maxwell Bridge
+        </button>
+    </div>
+
+    <section class="workspace">
+
+        <!-- =====================================================
+             SVG VISUAL SECTION
+             ===================================================== -->
+
+        <div class="visual-area">
+
+            <h2 class="section-title">
+                સર્કિટ / Circuit
+            </h2>
+
+            <div class="svg-wrap">
+
+                <svg id="bridgeSvg"
+                     viewBox="0 0 650 430"
+                     aria-label="Bridge circuit diagram">
+
+                    <!-- Background -->
+                    <rect x="0" y="0"
+                          width="650"
+                          height="430"
+                          fill="#ffffff"/>
+
+                    <!-- Title -->
+                    <text id="svgTitle"
+                          x="325"
+                          y="30"
+                          text-anchor="middle"
+                          font-size="19"
+                          font-weight="800"
+                          fill="#172554">
+                        Wheatstone Bridge
+                    </text>
+
+                    <!-- Source -->
+                    <line class="source-wire"
+                          x1="50" y1="215"
+                          x2="115" y2="215"/>
+
+                    <line class="source-wire"
+                          x1="535" y1="215"
+                          x2="600" y2="215"/>
+
+                    <circle cx="42" cy="215" r="7"
+                            fill="#2563eb"/>
+                    <circle cx="608" cy="215" r="7"
+                            fill="#2563eb"/>
+
+                    <text x="28" y="194"
+                          font-size="12"
+                          fill="#2563eb"
+                          font-weight="800">
+                        +
+                    </text>
+
+                    <text x="600" y="194"
+                          font-size="12"
+                          fill="#2563eb"
+                          font-weight="800">
+                        −
+                    </text>
+
+                    <text x="32" y="245"
+                          class="svg-caption">
+                        DC / AC Source
+                    </text>
+
+                    <!-- Bridge diamond -->
+                    <line class="wire"
+                          x1="115" y1="215"
+                          x2="325" y2="80"/>
+
+                    <line class="wire"
+                          x1="325" y1="80"
+                          x2="535" y2="215"/>
+
+                    <line class="wire"
+                          x1="115" y1="215"
+                          x2="325" y2="350"/>
+
+                    <line class="wire"
+                          x1="325" y1="350"
+                          x2="535" y2="215"/>
+
+                    <!-- =================================================
+                         COMPONENTS
+                         ================================================= -->
+
+                    <!-- R1 -->
+                    <g id="component1">
+                        <rect class="component"
+                              x="195" y="126"
+                              width="70"
+                              height="30"
+                              rx="5"/>
+                        <text id="componentLabel1"
+                              class="component-label"
+                              x="230" y="147"
+                              text-anchor="middle">
+                            R₁
+                        </text>
+                    </g>
+
+                    <!-- R2 -->
+                    <g id="component2">
+                        <rect class="component"
+                              x="385" y="126"
+                              width="70"
+                              height="30"
+                              rx="5"/>
+                        <text id="componentLabel2"
+                              class="component-label"
+                              x="420" y="147"
+                              text-anchor="middle">
+                            R₂
+                        </text>
+                    </g>
+
+                    <!-- R3 -->
+                    <g id="component3">
+                        <rect class="component"
+                              x="195" y="274"
+                              width="70"
+                              height="30"
+                              rx="5"/>
+                        <text id="componentLabel3"
+                              class="component-label"
+                              x="230" y="295"
+                              text-anchor="middle">
+                            R₃
+                        </text>
+                    </g>
+
+                    <!-- Rx -->
+                    <g id="component4">
+
+                        <!-- Resistance -->
+                        <rect id="component4Rect"
+                              class="component"
+                              x="385"
+                              y="274"
+                              width="70"
+                              height="30"
+                              rx="5"/>
+
+                        <!-- Capacitor symbol -->
+                        <g id="capacitorSymbol"
+                           class="hidden">
+
+                            <line class="cap-plate"
+                                  x1="413" y1="265"
+                                  x2="413" y2="313"/>
+
+                            <line class="cap-plate"
+                                  x1="427" y1="265"
+                                  x2="427" y2="313"/>
+
+                        </g>
+
+                        <!-- Inductor symbol -->
+                        <g id="inductorSymbol"
+                           class="hidden">
+
+                            <path class="inductor-coil"
+                                  d="
+                                  M395 289
+                                  C395 270 407 270 407 289
+                                  C407 308 419 308 419 289
+                                  C419 270 431 270 431 289
+                                  C431 308 443 308 443 289
+                                  "/>
+
+                        </g>
+
+                        <text id="componentLabel4"
+                              class="component-label"
+                              x="420"
+                              y="295"
+                              text-anchor="middle">
+                            Rₓ
+                        </text>
+
+                    </g>
+
+                    <!-- Center galvanometer -->
+                    <line class="wire"
+                          x1="325" y1="80"
+                          x2="325" y2="180"/>
+
+                    <line class="wire"
+                          x1="325" y1="250"
+                          x2="325" y2="350"/>
+
+                    <circle cx="325" cy="215"
+                            r="35"
+                            fill="#f8fafc"
+                            stroke="#0f172a"
+                            stroke-width="3"/>
+
+                    <circle cx="325" cy="215"
+                            r="28"
+                            fill="white"
+                            stroke="#94a3b8"
+                            stroke-width="1.5"/>
+
+                    <text x="325"
+                          y="222"
+                          text-anchor="middle"
+                          font-size="21"
+                          font-weight="900"
+                          fill="#172033">
+                        G
+                    </text>
+
+                    <!-- Nodes -->
+                    <circle class="node"
+                            cx="115" cy="215" r="5"/>
+
+                    <circle class="node"
+                            cx="325" cy="80" r="5"/>
+
+                    <circle class="node"
+                            cx="535" cy="215" r="5"/>
+
+                    <circle class="node"
+                            cx="325" cy="350" r="5"/>
+
+                    <!-- Labels -->
+                    <text x="325" y="390"
+                          text-anchor="middle"
+                          class="svg-caption">
+                        Null detector / Galvanometer
+                    </text>
+
+                    <text id="svgDescription"
+                          x="325" y="410"
+                          text-anchor="middle"
+                          class="svg-caption">
+                        Unknown resistance measurement
+                    </text>
+
+                </svg>
+
+            </div>
+
+            <!-- =====================================================
+                 LIVE INSTRUMENT
+                 ===================================================== -->
+
+            <div class="instrument">
+
+                <h3>
+                    Live Galvanometer / Null Detector
+                </h3>
+
+                <div class="meter">
+
+                    <div class="meter-face">
+
+                        <!-- Dynamic ticks inserted by JS -->
+                        <div id="meterTicks"></div>
+
+                        <span class="scale-label scale-left">−</span>
+                        <span class="scale-label scale-zero">0</span>
+                        <span class="scale-label scale-right">+</span>
+
+                    </div>
+
+                    <!-- CORRECTED NEEDLE -->
+                    <div id="galvoNeedle"
+                         class="galvo-needle"></div>
+
+                    <div class="galvo-pivot"></div>
+
+                </div>
+
+                <div class="instrument-reading">
+                    Deflection:
+                    <span id="deflectionText">0.0°</span>
+                </div>
+
+                <div id="status"
+                     class="status">
+                    Bridge unbalanced
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- =====================================================
+             CONTROL SECTION
+             ===================================================== -->
+
+        <div class="controls"
+             id="ui-controls">
+        </div>
+
+    </section>
+
+    <!-- =========================================================
+         THEORY
+         ========================================================= -->
+
+    <section class="theory">
+
+        <h3>સિદ્ધાંત / Working Principle</h3>
+
+        <div id="theory-desc">
+        </div>
+
+        <div class="math-box"
+             id="theory-math">
+        </div>
+
+    </section>
+
+    <!-- =========================================================
+         LIVE CALCULATION
+         ========================================================= -->
+
+    <section class="calculation">
+
+        <h3>લાઇવ ગણતરી / Live Calculation</h3>
+
+        <div id="calculation-display">
+        </div>
+
+        <div class="error-bar">
+            <div id="errorFill"
+                 class="error-fill">
+            </div>
+        </div>
+
+        <div class="small-note">
+            લાલ પટ્ટી balance condition થી deviation દર્શાવે છે.
+        </div>
+
+    </section>
+
+    <!-- =========================================================
+         GUIDED EXPERIMENT IN GUJARATI
+         ========================================================= -->
+
+    <section class="guide">
+
+        <h3>
+            સ્ટેપ-બાય-સ્ટેપ ગાઈડેડ એક્સ્પેરિમેન્ટ / Step-by-Step Guided Experiment        </h3>
+
+        <div id="guideSteps">
+        </div>
+
+    </section>
+
+    <!-- =========================================================
+         OBSERVATION
+         ========================================================= -->
+
+    <section class="reference">
+
+        <strong>નોંધ:</strong>
+
+        <span id="observationText">
+            Slider બદલવાથી bridge balance condition અને
+            galvanometer deflection તરત બદલાય છે.
+        </span>
+
+    </section>
+
+</div>
+
+<footer>
+
+    <div>
+        Made with <span class="heart">❤️</span> by
+        <a href="https://rushabhvanara.github.io"
+           target="_blank">
+            Rushabh Vanara
+        </a>
+    </div>
+
+    <div>
+        Electrical Engineering Department,
+        Government Polytechnic Junagadh
+    </div>
+
+</footer>
+
+
+<script>
+
+/* ============================================================
+   BRIDGE CONFIGURATION
+   ============================================================ */
+
+const config = {
+
+    wheatstone: {
+
+        title:"Wheatstone Bridge",
+
+        params:{
+            r1:100,
+            r2:100,
+            r3:100,
+            rx:150
+        },
+
+        labels:[
+            "R₁ (Ω)",
+            "R₂ (Ω)",
+            "R₃ (Ω)",
+            "Rₓ (Ω)"
+        ],
+
+        units:["Ω","Ω","Ω","Ω"],
+
+        description:
+        "Wheatstone Bridge નો ઉપયોગ અજ્ઞાત resistance Rₓ શોધવા માટે થાય છે. Balance condition પર galvanometer માંથી current શૂન્ય થાય છે અને બંને arm ratios સમાન થાય છે.",
+
+        equation:
+        `
+        <math display="block">
+            <mfrac>
+                <msub><mi>R</mi><mn>1</mn></msub>
+                <msub><mi>R</mi><mn>3</mn></msub>
+            </mfrac>
+            <mo>=</mo>
+            <mfrac>
+                <msub><mi>R</mi><mn>2</mn></msub>
+                <msub><mi>R</mi><mn>x</mn></msub>
+            </mfrac>
+        </math>
+        `,
+
+        svgLabels:["R₁","R₂","R₃","Rₓ"],
+
+        guide:[
+            "સૌપ્રથમ Wheatstone Bridge પસંદ કરો.",
+            "R₁, R₂ અને R₃ ના મૂલ્યો સેટ કરો.",
+            "Galvanometer ની needle કઈ દિશામાં deflect થાય છે તે જુઓ.",
+            "Rₓ slider બદલીને galvanometer deflection ઘટાડો.",
+            "જ્યારે needle 0° પર આવે ત્યારે bridge balance થાય છે.",
+            "Balance condition પરથી Rₓ નું મૂલ્ય ચકાસો."
+        ]
+    },
+
+    desauty: {
+
+        title:"De Sauty's Bridge",
+
+        params:{
+            r1:200,
+            r2:400,
+            c1:20,
+            cx:40
+        },
+
+        labels:[
+            "R₁ (Ω)",
+            "R₂ (Ω)",
+            "C₁ (µF)",
+            "Cₓ (µF)"
+        ],
+
+        units:["Ω","Ω","µF","µF"],
+
+        description:
+        "De Sauty's Bridge બે capacitors ની capacitance ની સરખામણી કરવા માટે વપરાય છે. અહીં C₁ standard capacitor અને Cₓ unknown capacitor છે.",
+
+        equation:
+        `
+        <math display="block">
+            <mfrac>
+                <msub><mi>C</mi><mn>1</mn></msub>
+                <msub><mi>C</mi><mi>x</mi></msub>
+            </mfrac>
+            <mo>=</mo>
+            <mfrac>
+                <msub><mi>R</mi><mn>2</mn></msub>
+                <msub><mi>R</mi><mn>1</mn></msub>
+            </mfrac>
+        </math>
+        `,
+
+        svgLabels:["R₁","R₂","C₁","Cₓ"],
+
+        guide:[
+            "De Sauty's Bridge પસંદ કરો.",
+            "C₁ ને standard capacitor તરીકે સેટ કરો.",
+            "R₁ અને R₂ ના resistance values સેટ કરો.",
+            "Cₓ slider બદલીને galvanometer deflection ઘટાડો.",
+            "Needle 0° પર આવે ત્યારે bridge balance થાય છે.",
+            "Balance equation દ્વારા unknown capacitance Cₓ ચકાસો."
+        ]
+    },
+
+    maxwell: {
+
+        title:"Maxwell Inductance Bridge",
+
+        params:{
+            r1:200,
+            r2:400,
+            l3:40,
+            lx:100
+        },
+
+        labels:[
+            "R₁ (Ω)",
+            "R₂ (Ω)",
+            "L₃ (mH)",
+            "Lₓ (mH)"
+        ],
+
+        units:["Ω","Ω","mH","mH"],
+
+        description:
+        "Maxwell Inductance Bridge નો ઉપયોગ unknown inductance Lₓ શોધવા માટે થાય છે. Standard inductance L₃ અને resistive ratio arms દ્વારા unknown inductance ની સરખામણી કરવામાં આવે છે.",
+
+        equation:
+        `
+        <math display="block">
+            <mfrac>
+                <msub><mi>L</mi><mn>3</mn></msub>
+                <msub><mi>L</mi><mi>x</mi></msub>
+            </mfrac>
+            <mo>=</mo>
+            <mfrac>
+                <msub><mi>R</mi><mn>1</mn></msub>
+                <msub><mi>R</mi><mn>2</mn></msub>
+            </mfrac>
+        </math>
+        `,
+
+        svgLabels:["R₁","R₂","L₃","Lₓ"],
+
+        guide:[
+            "Maxwell Inductance Bridge પસંદ કરો.",
+            "L₃ ને standard inductor તરીકે સેટ કરો.",
+            "R₁ અને R₂ ના resistance values સેટ કરો.",
+            "Lₓ slider બદલીને galvanometer deflection ઘટાડો.",
+            "Needle 0° પર આવે ત્યારે bridge balance થાય છે.",
+            "Balance equation દ્વારા unknown inductance Lₓ ચકાસો."
+        ]
+    }
+
+};
+
+
+/* ============================================================
+   STATE
+   ============================================================ */
+
+let activeBridge = "wheatstone";
+
+
+/* ============================================================
+   DOM
+   ============================================================ */
+
+const controls =
+    document.getElementById("ui-controls");
+
+const needle =
+    document.getElementById("galvoNeedle");
+
+const status =
+    document.getElementById("status");
+
+const calculation =
+    document.getElementById("calculation-display");
+
+const errorFill =
+    document.getElementById("errorFill");
+
+const deflectionText =
+    document.getElementById("deflectionText");
+
+const guideSteps =
+    document.getElementById("guideSteps");
+
+const component4Rect =
+    document.getElementById("component4Rect");
+
+const capacitorSymbol =
+    document.getElementById("capacitorSymbol");
+
+const inductorSymbol =
+    document.getElementById("inductorSymbol");
+
+
+/* ============================================================
+   CREATE GALVANOMETER SCALE
+   ============================================================ */
+
+function createMeterScale(){
+
+    const container =
+        document.getElementById("meterTicks");
+
+    container.innerHTML="";
+
+    /*
+       13 ticks from -60° to +60°.
+       CSS transform origin is the bottom-center of each tick,
+       producing a true radial analog scale.
+    */
+
+    for(let i=0;i<=12;i++){
+
+        const angle =
+            -60 + i*10;
+
+        const tick =
+            document.createElement("div");
+
+        tick.className =
+            "tick " +
+            (i%2===0 ? "major" : "");
+
+        tick.style.transform =
+            `translateX(-50%) rotate(${angle}deg)`;
+
+        container.appendChild(tick);
+    }
+}
+
+
+/* ============================================================
+   INITIALIZE BRIDGE
+   ============================================================ */
+
+function initBridge(type){
+
+    activeBridge = type;
+
+    document
+        .querySelectorAll(".tab-btn")
+        .forEach(btn=>{
+            btn.classList.remove("active");
+        });
+
+    document
+        .getElementById("btn-"+type)
+        .classList.add("active");
+
+    updateSVG();
+
+    renderControls();
+
+    updateTheory();
+
+    updateGuide();
+
+    calculateBalance();
+}
+
+
+/* ============================================================
+   UPDATE SVG
+   ============================================================ */
+
+function updateSVG(){
+
+    const bridge =
+        config[activeBridge];
+
+    document
+        .getElementById("svgTitle")
+        .textContent =
+        bridge.title;
+
+    document
+        .getElementById("svgDescription")
+        .textContent =
+        activeBridge==="wheatstone"
+        ? "Unknown resistance measurement"
+        : activeBridge==="desauty"
+        ? "Capacitance comparison using standard capacitor"
+        : "Unknown inductance measurement";
+
+    for(let i=0;i<4;i++){
+
+        document
+            .getElementById("componentLabel"+(i+1))
+            .textContent =
+            bridge.svgLabels[i];
+    }
+
+    /* Reset special symbols */
+
+    capacitorSymbol.classList.add("hidden");
+    inductorSymbol.classList.add("hidden");
+
+    component4Rect.classList.remove("hidden");
+
+    /*
+       De Sauty:
+       replace bottom-right resistor with capacitor.
+    */
+
+    if(activeBridge==="desauty"){
+
+        component4Rect.classList.add("hidden");
+
+        capacitorSymbol.classList.remove("hidden");
+
+    }
+
+    /*
+       Maxwell:
+       replace bottom-right resistor with inductor.
+    */
+
+    if(activeBridge==="maxwell"){
+
+        component4Rect.classList.add("hidden");
+
+        inductorSymbol.classList.remove("hidden");
+
+    }
+}
+
+
+/* ============================================================
+   RENDER CONTROLS
+   ============================================================ */
+
+function renderControls(){
+
+    const bridge =
+        config[activeBridge];
+
+    controls.innerHTML="";
+
+    Object.keys(bridge.params)
+        .forEach((key,index)=>{
+
+            const value =
+                bridge.params[key];
+
+            let min=10;
+            let max=1000;
+            let step=1;
+
+            if(key.startsWith("c")){
+                min=1;
+                max=100;
+                step=1;
+            }
+
+            if(key.startsWith("l")){
+                min=1;
+                max=200;
+                step=1;
+            }
+
+            const card =
+                document.createElement("div");
+
+            card.className =
+                "control-card";
+
+            card.innerHTML=`
+
+                <label>
+                    ${bridge.labels[index]}
+
+                    <span
+                        class="value"
+                        id="val-${key}">
+                        ${formatValue(value,key)}
+                    </span>
+                </label>
+
+                <input
+                    type="range"
+                    id="slider-${key}"
+                    min="${min}"
+                    max="${max}"
+                    step="${step}"
+                    value="${value}">
+
+            `;
+
+            controls.appendChild(card);
+
+            document
+                .getElementById("slider-"+key)
+                .addEventListener(
+                    "input",
+                    function(){
+
+                        bridge.params[key] =
+                            parseFloat(this.value);
+
+                        document
+                            .getElementById("val-"+key)
+                            .textContent =
+                            formatValue(
+                                bridge.params[key],
+                                key
+                            );
+
+                        calculateBalance();
+                    }
+                );
+
+        });
+
+}
+
+
+/* ============================================================
+   FORMAT VALUES
+   ============================================================ */
+
+function formatValue(value,key){
+
+    if(key.startsWith("c"))
+        return value.toFixed(0)+" µF";
+
+    if(key.startsWith("l"))
+        return value.toFixed(0)+" mH";
+
+    return value.toFixed(0)+" Ω";
+}
+
+
+/* ============================================================
+   THEORY
+   ============================================================ */
+
+function updateTheory(){
+
+    const bridge =
+        config[activeBridge];
+
+    document
+        .getElementById("theory-desc")
+        .textContent =
+        bridge.description;
+
+    document
+        .getElementById("theory-math")
+        .innerHTML =
+        bridge.equation;
+}
+
+
+/* ============================================================
+   GUIDED STEPS
+   ============================================================ */
+
+function updateGuide(){
+
+    const bridge =
+        config[activeBridge];
+
+    guideSteps.innerHTML="";
+
+    bridge.guide.forEach(
+        (step,index)=>{
+
+            const div =
+                document.createElement("div");
+
+            div.className="step";
+
+            div.innerHTML=`
+
+                <div class="step-no">
+                    ${index+1}
+                </div>
+
+                <div>
+                    ${step}
+                </div>
+
+            `;
+
+            guideSteps.appendChild(div);
+
+        }
+    );
+}
+
+
+/* ============================================================
+   BALANCE CALCULATION
+   ============================================================ */
+
+function calculateBalance(){
+
+    const p =
+        config[activeBridge].params;
+
+    let ratio1=0;
+    let ratio2=0;
+    let difference=0;
+    let balanceValue=0;
+    let equationHTML="";
+
+    /* --------------------------------------------------------
+       WHEATSTONE
+       -------------------------------------------------------- */
+
+    if(activeBridge==="wheatstone"){
+
+        ratio1 =
+            p.r1/p.r3;
+
+        ratio2 =
+            p.r2/p.rx;
+
+        difference =
+            ratio1-ratio2;
+
+        balanceValue =
+            p.r2*p.r3/p.r1;
+
+        equationHTML=`
+
+            <div class="calc-row">
+                <span>R₁ / R₃</span>
+                <span>
+                    ${p.r1} / ${p.r3}
+                    =
+                    ${ratio1.toFixed(4)}
+                </span>
+            </div>
+
+            <div class="calc-row">
+                <span>R₂ / Rₓ</span>
+                <span>
+                    ${p.r2} / ${p.rx}
+                    =
+                    ${ratio2.toFixed(4)}
+                </span>
+            </div>
+
+            <div class="calc-row">
+                <span>Calculated Rₓ</span>
+                <strong>
+                    ${balanceValue.toFixed(2)} Ω
+                </strong>
+            </div>
+        `;
+    }
+
+    /* --------------------------------------------------------
+       DE SAUTY
+       -------------------------------------------------------- */
+
+    else if(activeBridge==="desauty"){
+
+        ratio1 =
+            p.c1/p.cx;
+
+        ratio2 =
+            p.r2/p.r1;
+
+        difference =
+            ratio1-ratio2;
+
+        balanceValue =
+            p.c1*p.r2/p.r1;
+
+        equationHTML=`
+
+            <div class="calc-row">
+                <span>C₁ / Cₓ</span>
+                <span>
+                    ${p.c1} / ${p.cx}
+                    =
+                    ${ratio1.toFixed(4)}
+                </span>
+            </div>
+
+            <div class="calc-row">
+                <span>R₂ / R₁</span>
+                <span>
+                    ${p.r2} / ${p.r1}
+                    =
+                    ${ratio2.toFixed(4)}
+                </span>
+            </div>
+
+            <div class="calc-row">
+                <span>Calculated Cₓ</span>
+                <strong>
+                    ${balanceValue.toFixed(2)} µF
+                </strong>
+            </div>
+        `;
+    }
+
+    /* --------------------------------------------------------
+       MAXWELL
+       -------------------------------------------------------- */
+
+    else if(activeBridge==="maxwell"){
+
+        ratio1 =
+            p.l3/p.lx;
+
+        ratio2 =
+            p.r1/p.r2;
+
+        difference =
+            ratio1-ratio2;
+
+        balanceValue =
+            p.l3*p.r2/p.r1;
+
+        equationHTML=`
+
+            <div class="calc-row">
+                <span>L₃ / Lₓ</span>
+                <span>
+                    ${p.l3} / ${p.lx}
+                    =
+                    ${ratio1.toFixed(4)}
+                </span>
+            </div>
+
+            <div class="calc-row">
+                <span>R₁ / R₂</span>
+                <span>
+                    ${p.r1} / ${p.r2}
+                    =
+                    ${ratio2.toFixed(4)}
+                </span>
+            </div>
+
+            <div class="calc-row">
+                <span>Calculated Lₓ</span>
+                <strong>
+                    ${balanceValue.toFixed(2)} mH
+                </strong>
+            </div>
+        `;
+    }
+
+
+    /* ========================================================
+       GALVANOMETER DEFLECTION
+       ======================================================== */
+
+    /*
+       Normalize bridge error.
+
+       This is intentionally bounded so the virtual instrument
+       behaves like a real analog null detector rather than
+       producing unrealistic rotations.
+    */
+
+    let normalized =
+        difference /
+        Math.max(
+            Math.abs(ratio1),
+            Math.abs(ratio2),
+            0.001
+        );
+
+    let angle =
+        normalized * 45;
+
+    /*
+       Correct range:
+       -60° ... +60°
+    */
+
+    angle =
+        Math.max(
+            -60,
+            Math.min(60,angle)
+        );
+
+    /*
+       Very small errors are visually treated as zero.
+    */
+
+    if(Math.abs(angle)<0.6)
+        angle=0;
+
+
+    /*
+       THIS IS THE IMPORTANT ROTATION FIX.
+
+       The needle is a vertical element positioned with its
+       bottom exactly at the galvanometer pivot.
+
+       transform-origin: 50% 100%
+
+       Therefore rotate(angle) produces a natural analog
+       galvanometer movement.
+    */
+
+    needle.style.transform =
+        `translateX(-50%) rotate(${angle}deg)`;
+
+
+    deflectionText.textContent =
+        angle.toFixed(1)+"°";
+
+
+    /* ========================================================
+       STATUS
+       ======================================================== */
+
+    const balanced =
+        Math.abs(angle)<1.5;
+
+    status.classList.remove(
+        "balance",
+        "unbalance"
+    );
+
+    if(balanced){
+
+        status.classList.add("balance");
+
+        status.textContent =
+            "✓ Bridge Balanced — Null Point";
+
+        needle.style.background =
+            "#22c55e";
+
+    }else{
+
+        status.classList.add("unbalance");
+
+        status.textContent =
+            "Bridge Unbalanced";
+
+        needle.style.background =
+            "#ef4444";
+    }
+
+
+    /* ========================================================
+       ERROR BAR
+       ======================================================== */
+
+    const percentage =
+        Math.min(
+            100,
+            Math.abs(normalized)*100
+        );
+
+    errorFill.style.width =
+        percentage+"%";
+
+
+    /* ========================================================
+       LIVE CALCULATION
+       ======================================================== */
+
+    calculation.innerHTML =
+        equationHTML;
+
+
+    /* ========================================================
+       OBSERVATION TEXT
+       ======================================================== */
+
+    if(balanced){
+
+        document
+            .getElementById("observationText")
+            .textContent =
+            "Null point પ્રાપ્ત થયો છે. Galvanometer deflection લગભગ 0° છે અને bridge balance condition satisfy થાય છે.";
+
+    }else{
+
+        document
+            .getElementById("observationText")
+            .textContent =
+            "Slider values બદલીને ratio equality તરફ જાઓ. Needle 0° તરફ જાય ત્યારે bridge balance ની નજીક છે.";
+    }
+}
+
+
+/* ============================================================
+   INITIALIZE
+   ============================================================ */
+
+createMeterScale();
+
+initBridge("wheatstone");
+
+
+/* ============================================================
+   KEYBOARD SUPPORT
+   ============================================================ */
+
+document.addEventListener(
+    "keydown",
+    function(event){
+
+        /*
+           1 = Wheatstone
+           2 = De Sauty
+           3 = Maxwell
+        */
+
+        if(event.key==="1")
+            initBridge("wheatstone");
+
+        if(event.key==="2")
+            initBridge("desauty");
+
+        if(event.key==="3")
+            initBridge("maxwell");
+
+    }
+);
+
+</script>
+
+</body>
+</html>
