@@ -733,16 +733,35 @@ footer a{
 
                         <!-- Inductor symbol -->
                         <g id="inductorSymbol"
-                           class="hidden">
+                          <g transform="rotate(-32.5 420 289)">
 
-                            <path class="inductor-coil"
-                                  d="
-                                  M395 289
-                                  C395 270 407 270 407 289
-                                  C407 308 419 308 419 289
-                                  C419 270 431 270 431 289
-                                  C431 308 443 308 443 289
-                                  "/>
+  <!-- Left wire -->
+  <line x1="330" y1="289"
+        x2="395" y2="289"
+        stroke="black"
+        stroke-width="3"/>
+
+  <!-- Inductor -->
+  <path class="inductor-coil"
+        d="
+        M395 289
+        C395 255 411 255 411 289
+        C411 255 427 255 427 289
+        C427 255 443 255 443 289
+        C443 255 459 255 459 289
+        "
+        fill="none"
+        stroke="black"
+        stroke-width="3"
+        stroke-linecap="round"/>
+
+  <!-- Right wire -->
+  <line x1="459" y1="289"
+        x2="525" y2="289"
+        stroke="black"
+        stroke-width="3"/>
+
+</g>
 
                         </g>
 
